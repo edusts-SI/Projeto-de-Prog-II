@@ -1,7 +1,4 @@
 
-Escopo do Projeto: Jogo de Damas em C
-Aqui está uma proposta de escopo para o projeto do jogo de damas, detalhando os objetivos, funcionalidades e os requisitos técnicos que foram solicitados. A ideia é criar um jogo funcional e visualmente agradável no console.
-
 Nome do Projeto: DamasMaster C
 1. Objetivo Principal
 Desenvolver um jogo de damas para dois jogadores, totalmente funcional, implementado na linguagem C. O projeto focará na aplicação de conceitos fundamentais da programação como o uso de ponteiros para manipulação de dados, recursividade para lógicas complexas de captura e a utilização de arquivos para salvar e carregar o progresso do jogo. A interface do jogo será construída no console, utilizando a biblioteca gconio para uma melhor experiência visual.
