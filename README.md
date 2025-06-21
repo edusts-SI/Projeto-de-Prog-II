@@ -26,13 +26,6 @@ Persistência de Dados (Arquivos):
 
 Salvar Jogo: A qualquer momento, os jogadores poderão escolher salvar o estado atual da partida. As posições de todas as peças e a vez do jogador serão gravadas em um arquivo.
 Carregar Jogo: Será possível carregar uma partida salva anteriormente para continuar de onde parou.
-3. Estrutura do Repositório do Projeto
-O repositório no GitHub será organizado da seguinte forma:
 
-/codigo_fonte: Contendo todos os arquivos .c e .h do projeto.
-main.c: Arquivo principal que inicia o jogo.
-tabuleiro.c/tabuleiro.h: Funções para criar, exibir e manipular o tabuleiro.
-jogo.c/jogo.h: Funções que controlam a lógica do jogo, como validação de movimentos e capturas.
-arquivo.c/arquivo.h: Funções para salvar e carregar o estado do jogo.
-/documentacao: Incluirá a documentação formal do projeto, explicando a estrutura do código, as decisões de implementação e um manual do usuário.
-README.md: Um arquivo inicial com a descrição do projeto e instruções de como compilar e executar o jogo.
+
+
