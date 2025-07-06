@@ -17,3 +17,13 @@
 
 #define jogador_bra 1
 #define jogador_prt 2
+
+//cores
+#define preto "\x1b[30m"
+#define vermelho "\x1b[31m"
+#define verde "\x1b[32m"
+#define amarelo "\x1b[33m"
+#define azul "\x1b[34m"
+#define magenta "\x1b[35m"
+#define ciano "\x1b[36m"
+#define branco "\x1b[37m"
