@@ -1,11 +1,11 @@
-#include <stdio.h> // nossa biblioteca padão
-#include <stdlib> // biblioteca para utilização do system (cls) para limpar o a tela para melhor visualização no terminal.
+#include <stdio.h> // Nossa biblioteca padão
+#include <stdlib> // Biblioteca para utilização do system (cls) para limpar a tela para melhor visualização no terminal.
 #include <string.h> // Utilizaremos para manipular strings.
-#include <ctype.h> // manipulação de caracteries.
-#include <windows.h> // para melhor controle do console.
-#include <conio.h> // manipulação de cores para melhor visualização.
+#include <ctype.h> // Manipulação de Caracteres.
+#include <windows.h> // Para melhor controle do console.
+#include <conio.h> // Manipulação de cores para melhor visualização.
 
-//Constantes que serão utilizadas ao longo do codico
+//Constantes que serão utilizadas ao longo do código
 
 #define TAMANHO 8 // tamanho da matriz (tabuleiro)
 //peças
