@@ -1,5 +1,5 @@
-#include <stdio.h> // Nossa biblioteca padão
-#include <stdlib> // Biblioteca para utilização do system (cls) para limpar a tela para melhor visualização no terminal.
+#include <stdio.h> // Nossa biblioteca padrão
+#include <stdlib.h> // Biblioteca para utilização do system (cls) para limpar a tela para melhor visualização no terminal.
 #include <string.h> // Utilizaremos para manipular strings.
 #include <ctype.h> // Manipulação de Caracteres.
 #include <windows.h> // Para melhor controle do console.
@@ -7,7 +7,7 @@
 
 //Constantes que serão utilizadas ao longo do código
 
-#define TAMANHO 8 // tamanho da matriz (tabuleiro)
+#define TAM 8 // tamanho da matriz (tabuleiro)
 //peças
 #define VAZIO ' '
 #define BRANCA 'b'
@@ -20,7 +20,6 @@
 
 //cores
 #define RESET "\033[0m"
-#define preto "\x1b[30m"
 #define vermelho "\x1b[31m"
 #define verde "\x1b[32m"
 #define amarelo "\x1b[33m"
@@ -82,7 +81,27 @@ void menu(){
 	printf("\n\t Insira uma opcao: ");
 	
 }
-
+int selecionaJogador(){
+	
+	int escolha;
+	do{
+		printf(ciano"\n\n\t==================\n"RESET);
+		printf(ciano"\tEscolha suas pecas"RESET);
+		printf(ciano"\n\t==================\n"RESET);
+		
+		printf("\n\t 1 - Brancas(o)\n");
+		printf("\n\t 2 - Pretas(O)\n");
+		printf("\n\tOpcao: ");
+		printf(ciano"\n\n\t==================\n"RESET);
+		scanf("%d",&escolha);
+		
+		if (escolha==1 || escolha==2){
+			return escolha;
+		}
+	
+	}
+		while(1);
+}
 void clean(){
 	
 system("cls");}
@@ -100,11 +119,12 @@ int main() {
 	
 	switch(opcao){
 		
-		case 1: 
+		case 1:
 		clean();
+		selecionaJogador();
 		inicializarTabuleiro(tabuleiro);
 		imprimirTabuleiro(tabuleiro);
-		
+
 		break;
 		
 		case 2:
