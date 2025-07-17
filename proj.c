@@ -44,6 +44,7 @@ void imprimirTabuleiro(char tabuleiro[TAM][TAM]) {
             if (peca == 'O') {
                 printf(vermelho "O" RESET);
             } else if (peca == 'o') {
+            
                 printf(branco "o" RESET);
             } else {
                 printf(" ");
@@ -93,6 +94,42 @@ void clean(){
     system("cls");
 }
 
+--
+void status(char tabuleiro[TAM][TAM], int jogadorAtual){
+    int pBrancas = 0;
+    int pPretas = 0;
+    
+    printf(amarelo"\n\n\t==================\n"RESET);
+    printf(azul"\t  STATUS DO JOGO\t"RESET);
+    printf(amarelo"\n\t==================\n"RESET);
+    
+    printf("\nVez do jogador: %d ", jogadorAtual);
+    
+    if (jogadorAtual == 1) {
+        printf("Branca: o");
+    }
+    else {
+        printf("Preta: O");
+    }
+    
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            char peca = tabuleiro[i][j];
+            
+            if (peca == 'o') {
+                pBrancas += 1;
+            }
+            if (peca == 'O') {
+                pPretas += 1;
+            }
+        }
+    }        
+    printf("\nPecas Brancas: %d", pBrancas);
+    printf("\nPecas pretas: %d\n", pPretas);
+    
+    printf(amarelo"\n\t==================\n"RESET);
+}
+
 bool converterCoordenadas(char col, int linha, int *x, int *y) {
     *x = linha - 1;
     *y = toupper(col) - 'A';
@@ -102,26 +139,87 @@ bool converterCoordenadas(char col, int linha, int *x, int *y) {
     }
     return true;
 }
-bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xDestino, int yDestino, int jogador) {
-    if (xDestino < 0 || xDestino >= TAM || yDestino < 0 || yDestino >= TAM)
+--
+bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xDestino, int yDestino, int jogador, int *captura) {
+    char peca = tabuleiro[xOrigem][yOrigem];
+    
+    if ((jogador == 1 && peca != 'o') || (jogador == 2 && peca != 'O'))
+        return false;
+        
+    char pecaAdversario = peca;
+    
+    if (jogador == 1) {
+        pecaAdversario = 'O';
+    } else {
+        pecaAdversario = 'o';
+    }
+        
+    int xMeio = (xOrigem + xDestino) / 2;
+    int yMeio = (yOrigem + yDestino) / 2;
+    
+    if (xDestino < 0 || xDestino >= TAM || yDestino < 0 || yDestino >= TAM) 
         return false;
     if (tabuleiro[xDestino][yDestino] != ' ')
         return false;
-    if (abs(xDestino - xOrigem) != 1 || abs(yDestino - yOrigem) != 1)
+        
+    if (abs(xDestino - xOrigem) == 1 && abs(yDestino - yOrigem) == 1) {
+        if (captura) *captura = 0;
+            if (peca == 'o' && xDestino < xOrigem)
+                return true;
+            if (peca == 'O' && xDestino > xOrigem)
+                return true;
         return false;
-
-    char peca = tabuleiro[xOrigem][yOrigem];
-
-    if ((jogador == 1 && peca != 'o') || (jogador == 2 && peca != 'O'))
-        return false;
-    if (peca == 'o' && xDestino > xOrigem)
-        return false;
-    if (peca == 'O' && xDestino < xOrigem)
-        return false;
-
-    return true;
+    }
+    if (abs(xDestino - xOrigem) == 2 && abs(yDestino - yOrigem) == 2) {
+        char pMeio = tabuleiro[xMeio][yMeio];
+        
+        if (pecaAdversario != pMeio)
+            return false;
+        if (captura) *captura = 1;
+            return true;
+    }  
+    return false;
 }
-
+--
+int verificarCaptura(char tabuleiro[TAM][TAM], int jogadorAtual) {
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            char peca = tabuleiro[i][j];
+            if (peca == ' ') {
+                continue;
+            }
+            if (!((jogadorAtual == 1 && (peca == 'o')) || (jogadorAtual == 2 && peca == 'O'))) {
+                continue;
+            } 
+            int xDestino, yDestino;
+            
+            char dDiagonais[4][2] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+            
+            for (int l = 0; l < 4; l++) {
+                int lPassos = dDiagonais[l][0];
+                int cPassos = dDiagonais[l][1];
+                
+                xDestino = i + 2 * lPassos;
+                yDestino = j + 2 * cPassos;
+                    
+                int capturada = 0;
+            
+                if (validarMovimento(tabuleiro, i, j, xDestino, yDestino, jogadorAtual, &capturada) && capturada) {
+                    return 1;
+                }
+                if (peca == 'O' || peca == 'o') {
+                    break;
+                }
+                if (tabuleiro[xDestino][yDestino] != ' ') {
+                    break;    
+                }
+                   
+            }  
+        }   
+    } 
+    return 0;
+}    
+--
 void jogarPartida() {
     char tabuleiro[TAM][TAM];
     inicializarTabuleiro(tabuleiro);
@@ -132,30 +230,48 @@ void jogarPartida() {
     while (true) {
         clean();
         imprimirTabuleiro(tabuleiro);
-
+        status(tabuleiro, jogadorAtual);
+        
+        int pecaCapturar = verificarCaptura(tabuleiro, jogadorAtual);
+        
+        if (pecaCapturar) {
+            printf("Captura obrigatoria");
+        }
+        
         printf("\nJogador %d (%s), faca seu movimento (ex: A3B4): ",
-               jogadorAtual, jogadorAtual == 1 ? "brancas" : "pretas");
+        jogadorAtual, jogadorAtual == 1 ? "brancas" : "pretas");
 
         char colOrigem, colDestino;
         int linhaOrigem, linhaDestino;
         int xOrigem, yOrigem, xDestino, yDestino;
-
+              
         scanf(" %c%d %c%d", &colOrigem, &linhaOrigem, &colDestino, &linhaDestino);
 
         if (!converterCoordenadas(colOrigem, linhaOrigem, &xOrigem, &yOrigem)) {
             printf("Coordenada de origem inválida!\n");
-            continue;
+                continue;
         }
         if (!converterCoordenadas(colDestino, linhaDestino, &xDestino, &yDestino)) {
             printf("Coordenada de destino inválida.\n");
-            continue;
+                continue;
         }
+        int xMeio = (xOrigem + xDestino) / 2;
+        int yMeio = (yOrigem + yDestino) / 2;
+        
+        int captura = 0; 
+        
+        if (validarMovimento(tabuleiro, xOrigem, yOrigem, xDestino, yDestino, jogadorAtual, &captura)) {
+              if (pecaCapturar && !captura) {
+                  printf("Movimento inválido. Tente novamente.\n");
+                  continue;
+              }
+              tabuleiro[xDestino][yDestino] = tabuleiro[xOrigem][yOrigem];
+              tabuleiro[xOrigem][yOrigem] = ' ';
 
-        if (validarMovimento(tabuleiro, xOrigem, yOrigem, xDestino, yDestino, jogadorAtual)) {
-            tabuleiro[xDestino][yDestino] = tabuleiro[xOrigem][yOrigem];
-            tabuleiro[xOrigem][yOrigem] = ' ';
-
-            jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
+              if (captura == 1)
+                   tabuleiro[xMeio][yMeio] = ' ';
+                   
+              jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
         } else {
             printf("Movimento inválido. Tente novamente.\n");
         }
