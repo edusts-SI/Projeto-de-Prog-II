@@ -94,7 +94,7 @@ void clean(){
     system("cls");
 }
 
---
+//--
 void status(char tabuleiro[TAM][TAM], int jogadorAtual){
     int pBrancas = 0;
     int pPretas = 0;
@@ -139,7 +139,7 @@ bool converterCoordenadas(char col, int linha, int *x, int *y) {
     }
     return true;
 }
---
+//--
 bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xDestino, int yDestino, int jogador, int *captura) {
     char peca = tabuleiro[xOrigem][yOrigem];
     
@@ -180,7 +180,7 @@ bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xD
     }  
     return false;
 }
---
+//--
 int verificarCaptura(char tabuleiro[TAM][TAM], int jogadorAtual) {
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
@@ -219,7 +219,7 @@ int verificarCaptura(char tabuleiro[TAM][TAM], int jogadorAtual) {
     } 
     return 0;
 }    
---
+//--
 void jogarPartida() {
     char tabuleiro[TAM][TAM];
     inicializarTabuleiro(tabuleiro);
