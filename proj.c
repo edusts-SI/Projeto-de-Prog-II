@@ -20,7 +20,7 @@
                                                  /* Interface do jogo */
 
 //Procedimento que inicializa o tabuleiro com as "casas vazio", insere as peças pretas e brancas usando a logica matricial começando com
-//  as linhas e depois com as colunas utilizando a logica de ímpar ou para as peças so ficarem nos espaços "marrons".
+//  as linhas e depois com as colunas utilizando a logica de ímpar ou par para as peças só ficarem nos espaços "marrons".
 
 void inicializarTabuleiro(char tabuleiro[TAM][TAM]) {
     for (int i = 0; i < TAM; i++) {
@@ -44,7 +44,7 @@ void inicializarTabuleiro(char tabuleiro[TAM][TAM]) {
     }
 }
 
-                                                /* Procedimento que imprimi o tabuleiro */
+                                                /* Procedimento que imprime o tabuleiro */
 
 void imprimirTabuleiro(char tabuleiro[TAM][TAM]) {
     printf("      A   B   C   D   E   F   G   H\n");
@@ -52,14 +52,18 @@ void imprimirTabuleiro(char tabuleiro[TAM][TAM]) {
         printf("    +---+---+---+---+---+---+---+---+\n");
         printf("  %d |", i + 1);
         for (int j = 0; j < TAM; j++) {
-            char peca = tabuleiro[i][j];
-            if (peca == 'O') {
-                printf(vermelho " O " RESET);
-            } else if (peca == 'o') {
-                printf(branco " o " RESET);
-            } else {
-                printf("   ");
-            }
+        char peca = tabuleiro[i][j];
+           if (peca == 'O') {
+   			 printf(vermelho " O " RESET);
+			} else if (peca == 'o') {
+   				printf(branco " o " RESET);
+			} else if (peca == '@') {
+    			printf(vermelho " @ " RESET); // Dama preta
+			} else if (peca == '0') {
+    			printf(branco " 0 " RESET);   // Dama branca
+			} else {
+    			printf("   ");
+			}
             printf("|");
         }
         printf("\n");
@@ -99,8 +103,7 @@ int selecionaJogador() {
     } while (1);
 }
 
-                                                /*Procedimento que limpa a tela de execusão*/
-
+                                                /*Procedimento que limpa a tela de execução*/
 //Lê e identifica o sistema operacional para que seja versatil dentre os SO
 
 void clean() {
@@ -112,7 +115,6 @@ void clean() {
 }
 
                                         /*Procedimento o qual exibe o status do jogo*/
-
 //indica qual jogador da vez e diz quantas peças cada jogador ainda tem.
 
 void status(char tabuleiro[TAM][TAM], int jogadorAtual) {
@@ -123,17 +125,17 @@ void status(char tabuleiro[TAM][TAM], int jogadorAtual) {
     printf(amarelo "\n\t==================\n" RESET);
     printf("\nVez do jogador: " verde "%d " RESET "-> ", jogadorAtual);
     if (jogadorAtual == 1) {
-        printf("Brancas: o ");
+        printf("Brancas: " branco "o" RESET);
     } else {
         printf("Pretas: " vermelho "O" RESET);
     }
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
             char peca = tabuleiro[i][j];
-            if (peca == 'o') {
+            if (peca == 'o' || peca == '0') {
                 pBrancas++;
             }
-            if (peca == 'O') {
+            if (peca == 'O' || peca == '@') {
                 pPretas++;
             }
         }
@@ -143,7 +145,7 @@ void status(char tabuleiro[TAM][TAM], int jogadorAtual) {
     printf(amarelo "\n\t==================\n" RESET);
 }
 
-                                        /*Função que converte coordenadas matriciais para coordenadas de melhor coompreenção*/
+                                        /*Função que converte coordenadas matriciais para coordenadas de melhor compreensão*/
 
 // meio que traduz as coodenadas da matriz para uma linguagem de maior entendimento como:
 //(a6b5) lê como: casa na "coluna (a) na linha (6) para casa da coluna (b) na linha (5)" 
@@ -159,7 +161,7 @@ bool converterCoordenadas(char col, int linha, int *x, int *y) {
 
                                         /*Funções que dão os movimentos diagonais de ambas as peças*/
 
-//limita as peças de se moverem na horizontal ou vertical permitindo somente movimentos diagonais.  
+//limita as peças de se moverem na horizontal ou vertical permitindo somente movimentos diagonais. 
 
 bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xDestino, int yDestino, int jogador, int *captura) {
     if (xOrigem < 0 || xDestino < 0 || xDestino >= TAM || yDestino < 0 || yDestino >= TAM)
@@ -167,52 +169,100 @@ bool validarMovimento(char tabuleiro[TAM][TAM], int xOrigem, int yOrigem, int xD
     if (tabuleiro[xDestino][yDestino] != ' ')
         return false;
     char peca = tabuleiro[xOrigem][yOrigem];
-    if ((jogador == 1 && peca != 'o') || (jogador == 2 && peca != 'O'))
+    if ((jogador == 1 && (peca != 'o' && peca != '0')) || (jogador == 2 && (peca != 'O' && peca != '@')))
         return false;
+    
     int dx = abs(xDestino - xOrigem);
     int dy = abs(yDestino - yOrigem);
-    if (dx == 1 && dy == 1) {
-        *captura = 0;
-        if (peca == 'o' && xDestino > xOrigem) return false;
-        if (peca == 'O' && xDestino < xOrigem) return false;
-        return true;
-    }
-    if (dx == 2 && dy == 2) {
-        int xMeio = (xOrigem + xDestino) / 2;
-        int yMeio = (yOrigem + yDestino) / 2;
-        char pecaDoMeio = tabuleiro[xMeio][yMeio];
-        char pecaAdversaria = (jogador == 1) ? 'O' : 'o';
-        if (pecaDoMeio == pecaAdversaria) {
-            *captura = 1;
+    
+    // Movimento para peças normais
+    if (peca == 'o' || peca == 'O') {
+        if (dx == 1 && dy == 1) {
+            *captura = 0;
+            if ((peca == 'o' && xDestino > xOrigem) || (peca == 'O' && xDestino < xOrigem)) return false;
             return true;
         }
+        if (dx == 2 && dy == 2) {
+            int xMeio = (xOrigem + xDestino) / 2;
+            int yMeio = (yOrigem + yDestino) / 2;
+            char pecaDoMeio = tabuleiro[xMeio][yMeio];
+            char pecaAdversaria = (jogador == 1) ? 'O' : 'o';
+            char damaAdversaria = (jogador == 1) ? '@' : '0';
+            if (pecaDoMeio == pecaAdversaria || pecaDoMeio == damaAdversaria) {
+                *captura = 1;
+                return true;
+            }
+        }
+        return false;
     }
-    return false;
+    // Movimento para damas
+    else {
+        if (dx != dy) return false; // Dama deve mover na diagonal
+        
+        int passos = dx;
+        int dirX = (xDestino > xOrigem) ? 1 : -1;
+        int dirY = (yDestino > yOrigem) ? 1 : -1;
+        int pecasNoCaminho = 0;
+        int x = xOrigem + dirX;
+        int y = yOrigem + dirY;
+        
+        // Verifica o caminho
+        for (int i = 1; i < passos; i++) {
+            if (tabuleiro[x][y] != ' ') {
+                pecasNoCaminho++;
+                if (pecasNoCaminho > 1) return false; // Só pode pular uma peça
+                
+                char pecaNoCaminho = tabuleiro[x][y];
+                char pecaAdversaria = (jogador == 1) ? 'O' : 'o';
+                char damaAdversaria = (jogador == 1) ? '@' : '0';
+                
+                if (pecaNoCaminho != pecaAdversaria && pecaNoCaminho != damaAdversaria)
+                    return false; // Só pode pular peça adversária
+            }
+            x += dirX;
+            y += dirY;
+        }
+        
+        *captura = pecasNoCaminho;
+        return true;
+    }
 }
 
                                  /*Função que verifica se é possivel a captura */
-
 // se houver possivel captura ela retorna 1  
+
 
 int verificarCaptura(char tabuleiro[TAM][TAM], int jogadorAtual) {
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
-            if ((jogadorAtual == 1 && tabuleiro[i][j] == 'o') || (jogadorAtual == 2 && tabuleiro[i][j] == 'O')) {
-                int direcoes[4][2] = {{-2, -2}, {-2, 2}, {2, -2}, {2, 2}};
+            char peca = tabuleiro[i][j];
+
+            // Verifica se a peça pertence ao jogador atual
+            if ((jogadorAtual == 1 && (peca == 'o' || peca == '0')) ||
+                (jogadorAtual == 2 && (peca == 'O' || peca == '@'))) {
+
+                // Testa todas as 4 direções diagonais
+                int dirX[] = {-1, -1, 1, 1};
+                int dirY[] = {-1, 1, -1, 1};
+
                 for (int k = 0; k < 4; k++) {
-                    int xDestino = i + direcoes[k][0];
-                    int yDestino = j + direcoes[k][1];
-                    int capturaPossivel = 0;
-                    if (validarMovimento(tabuleiro, i, j, xDestino, yDestino, jogadorAtual, &capturaPossivel)) {
-                        if (capturaPossivel) {
-                            return 1;
+                    // Testa pulos de diferentes distâncias
+                    for (int passos = 2; passos < TAM; passos++) {
+                        int xDestino = i + passos * dirX[k];
+                        int yDestino = j + passos * dirY[k];
+                        int capturaPossivel = 0;
+
+                        if (validarMovimento(tabuleiro, i, j, xDestino, yDestino, jogadorAtual, &capturaPossivel)) {
+                            if (capturaPossivel) {
+                                return 1; // Encontrou uma captura obrigatória!
+                            }
                         }
                     }
                 }
             }
         }
     }
-    return 0;
+    return 0; // Nenhuma captura encontrada
 }
 
                                  /*Função que verifica em redor da peça se existe possivel captura*/
@@ -221,24 +271,34 @@ bool podeCapturarDe(char tabuleiro[TAM][TAM], int x, int y, int jogador) {
     if (x < 0 || x >= TAM || y < 0 || y >= TAM || tabuleiro[x][y] == ' ') {
         return false;
     }
-    int direcoes[4][2] = {{-2, -2}, {-2, 2}, {2, -2}, {2, 2}};
+
+    // Testa todas as 4 direções diagonais
+    int dirX[] = {-1, -1, 1, 1};
+    int dirY[] = {-1, 1, -1, 1};
+
     for (int k = 0; k < 4; k++) {
-        int xDestino = x + direcoes[k][0];
-        int yDestino = y + direcoes[k][1];
-        int capturaPossivel = 0;
-        if (validarMovimento(tabuleiro, x, y, xDestino, yDestino, jogador, &capturaPossivel)) {
-            if (capturaPossivel) {
-                return true;
+        // Testa pulos de diferentes distâncias
+        for (int passos = 2; passos < TAM; passos++) {
+            int xDestino = x + passos * dirX[k];
+            int yDestino = y + passos * dirY[k];
+            int capturaPossivel = 0;
+
+            if (validarMovimento(tabuleiro, x, y, xDestino, yDestino, jogador, &capturaPossivel)) {
+                if (capturaPossivel) {
+                    return true; // Encontrou uma captura possível para esta peça!
+                }
             }
         }
     }
-    return false;
+
+    return false; // Nenhuma captura encontrada para esta peça.
 }
 
                                  /*Procedimento que executa o salvamento do jogador atual em um arquivo */
 
 // o procedimento abre o arquivo, verifica se a existencia do mesmo, logo em seguida ele percorre o tabuleiro por linha e coluna,
 //  copiando cada caracterie ali presente e colando no arquivo. O 'fputc' fucionará como um enter pulando para a próxima linha no arquivo.
+
 
 void salvarJogo(char tabuleiro[TAM][TAM], int jogadorAtual) {
     FILE *arquivo = fopen(NOME_ARQUIVO, "w");
@@ -263,6 +323,7 @@ void salvarJogo(char tabuleiro[TAM][TAM], int jogadorAtual) {
 //abre o arquivo verifica se a jogo salvo, lê a primeira linha do arquivo, que contém apenas um número e armazena na variavel jogadorAtual.
 // basicamente funciona como o inverso da função salvarJogo. 
 
+
 bool carregarJogo(char tabuleiro[TAM][TAM], int *jogadorAtual) {
     FILE *arquivo = fopen(NOME_ARQUIVO, "r");
     if (arquivo == NULL) {
@@ -272,6 +333,7 @@ bool carregarJogo(char tabuleiro[TAM][TAM], int *jogadorAtual) {
     }
     fscanf(arquivo, "%d", jogadorAtual);
     fgetc(arquivo);
+
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
             tabuleiro[i][j] = fgetc(arquivo);
@@ -284,6 +346,35 @@ bool carregarJogo(char tabuleiro[TAM][TAM], int *jogadorAtual) {
     return true;
 }
 
+
+                                /*Função Fim*/
+
+// verifica qual jogador perdeu todas as peças assim determinando o vencedor e o fim do jogo
+
+int fimDeJogo(char tabuleiro[TAM][TAM]) {
+    int pBrancas = 0;
+    int pPretas = 0;
+    
+    for (int i = 0; i < TAM; i++) {
+        for (int j = 0; j < TAM; j++) {
+            char peca = tabuleiro[i][j];
+            if (peca == 'o' || peca == '0') {
+                pBrancas++;
+            }
+            if (peca == 'O' || peca == '@') {
+                pPretas++;
+            }
+        }
+    }
+    if (pPretas == 0) {
+        return 1;
+    }
+    if (pBrancas == 0) {
+        return 2;
+    }    
+    return 0;     
+ }
+    
                                  /*Procedimento onde contém o loop e irá estar chamando todas as outras funções e procedimentos e inicializa o jogo */
 
 //é o motor que executa o jogo em um ciclo contínuo, cuidando de mostrar o tabuleiro, receber e validar jogadas, 
@@ -313,8 +404,12 @@ void jogarPartida(char tabuleiro[TAM][TAM], int jogadorAtual) {
              continue;
         }
         int xOrigem, yOrigem, xDestino, yDestino;
-        converterCoordenadas(colOrigem, linhaOrigem, &xOrigem, &yOrigem);
-        converterCoordenadas(colDestino, linhaDestino, &xDestino, &yDestino);
+        if (!converterCoordenadas(colOrigem, linhaOrigem, &xOrigem, &yOrigem) || 
+            !converterCoordenadas(colDestino, linhaDestino, &xDestino, &yDestino)) {
+            printf(vermelho "Coordenadas invalidas! Tente novamente.\n" RESET);
+            system("pause");
+            continue;
+        }
         int capturaRealizada = 0;
         if (validarMovimento(tabuleiro, xOrigem, yOrigem, xDestino, yDestino, jogadorAtual, &capturaRealizada)) {
             if (capturaObrigatoria && !capturaRealizada) {
@@ -322,25 +417,57 @@ void jogarPartida(char tabuleiro[TAM][TAM], int jogadorAtual) {
                 system("pause");
                 continue;
             }
-            tabuleiro[xDestino][yDestino] = tabuleiro[xOrigem][yOrigem];
+            // Primeiro verifica qual é a peça que está sendo movida
+            char pecaMovida = tabuleiro[xOrigem][yOrigem];
+            // Move a peça para o destino
+            tabuleiro[xDestino][yDestino] = pecaMovida;
             tabuleiro[xOrigem][yOrigem] = ' ';
+            
+            // Verifica promoção para dama
+            if (pecaMovida == 'o' && xDestino == 0) {
+                tabuleiro[xDestino][yDestino] = '0'; // Dama branca
+            } else if (pecaMovida == 'O' && xDestino == 7) {
+                tabuleiro[xDestino][yDestino] = '@'; // Dama preta
+            }
+
             if (capturaRealizada) {
-                int xMeio = (xOrigem + xDestino) / 2;
-                int yMeio = (yOrigem + yDestino) / 2;
-                tabuleiro[xMeio][yMeio] = ' ';
+                int dirX = (xDestino > xOrigem) ? 1 : -1;
+                int dirY = (yDestino > yOrigem) ? 1 : -1;
+                int x = xOrigem + dirX;
+                int y = yOrigem + dirY;
+                
+                while (x != xDestino && y != yDestino) {
+                    if (tabuleiro[x][y] != ' ') {
+                        tabuleiro[x][y] = ' '; // Remove a peça capturada
+                        break;
+                    }
+                    x += dirX;
+                    y += dirY;
+                }
+                
                 if (podeCapturarDe(tabuleiro, xDestino, yDestino, jogadorAtual)) {
                     printf(verde "\nCAPTURA MULTIPLA! Continue jogando com a mesma peca.\n" RESET);
                     system("pause");
                     continue;
                 }
             }
+
             jogadorAtual = (jogadorAtual == 1) ? 2 : 1;
+
         } else {
             printf(vermelho "Movimento invalido. Tente novamente.\n" RESET);
             system("pause");
         }
+        int jogadorVencedor = fimDeJogo(tabuleiro);
+        
+        if (jogadorVencedor != 0) {
+            printf(verde"\nFIM DE JOGO! VENCEDOR: Jogador %d\n" RESET, jogadorVencedor);
+            system("pause");
+            break;
+        }    
     }
 }
+
 
                                 /*Nossa Main*/
 
